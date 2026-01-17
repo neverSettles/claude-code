@@ -7,6 +7,7 @@ set -euo pipefail
 
 # Default configuration
 DEFAULT_VARIANTS=3
+STREAM_MODE=false
 VARIATION_HINTS=(
   "Focus on clean, simple, readable code. Prefer straightforward solutions over clever ones."
   "Focus on efficiency and performance. Optimize for speed and resource usage."
@@ -31,6 +32,7 @@ ARGUMENTS:
 
 OPTIONS:
   --variants N   Number of parallel variants (default: 3, max: 10)
+  --stream       Show live streaming output from all variants
   -h, --help     Show this help message
 
 DESCRIPTION:
@@ -68,6 +70,10 @@ HELP_EOF
       fi
       NUM_VARIANTS="$2"
       shift 2
+      ;;
+    --stream)
+      STREAM_MODE=true
+      shift
       ;;
     *)
       if [[ -z "$PROMPT" ]]; then
@@ -209,7 +215,15 @@ When you're done, create a file called .choices-output/DONE.md with a brief summ
     cd "$VARIANT_DIR"
     # Use --print with --dangerously-skip-permissions to avoid interactive prompts
     # Read prompt from file to handle special characters safely
-    "$CLAUDE_BIN" --print --dangerously-skip-permissions "$(cat .choices-output/prompt.txt)" > ".choices-output/claude.log" 2>&1
+    if [[ "$STREAM_MODE" == "true" ]]; then
+      # Stream mode: output JSON stream for real-time monitoring
+      # Note: --verbose is required with --output-format stream-json
+      "$CLAUDE_BIN" --print --dangerously-skip-permissions --verbose --output-format stream-json \
+        "$(cat .choices-output/prompt.txt)" 2>&1 | tee ".choices-output/stream.jsonl" > ".choices-output/claude.log"
+    else
+      # Normal mode: just capture output
+      "$CLAUDE_BIN" --print --dangerously-skip-permissions "$(cat .choices-output/prompt.txt)" > ".choices-output/claude.log" 2>&1
+    fi
     echo "COMPLETED" > ".choices-output/status"
   ) &
 
@@ -239,15 +253,22 @@ echo ""
 echo "═══════════════════════════════════════════════════════════"
 echo "🚀 All $NUM_VARIANTS variants are now running in parallel!"
 echo "═══════════════════════════════════════════════════════════"
-echo ""
-echo "📊 Monitor progress:"
-echo "   /choices-review    - Check status and compare implementations"
-echo ""
-echo "🎯 When complete:"
-echo "   /choices-pick N    - Select variant N as the winner"
-echo ""
-echo "❌ To cancel:"
-echo "   /choices-cancel    - Stop all variants and cleanup"
-echo ""
-echo "📁 Worktrees created at: $WORKTREE_BASE"
-echo ""
+
+if [[ "$STREAM_MODE" == "true" ]]; then
+  # Run the stream monitor in foreground
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  "$SCRIPT_DIR/monitor-streams.sh" "$WORKTREE_BASE" "$NUM_VARIANTS"
+else
+  echo ""
+  echo "📊 Monitor progress:"
+  echo "   /choices-review    - Check status and compare implementations"
+  echo ""
+  echo "🎯 When complete:"
+  echo "   /choices-pick N    - Select variant N as the winner"
+  echo ""
+  echo "❌ To cancel:"
+  echo "   /choices-cancel    - Stop all variants and cleanup"
+  echo ""
+  echo "📁 Worktrees created at: $WORKTREE_BASE"
+  echo ""
+fi

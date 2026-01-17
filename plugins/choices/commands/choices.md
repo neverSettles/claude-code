@@ -1,6 +1,6 @@
 ---
 description: "Start parallel exploration - create multiple implementation variants using git worktrees"
-argument-hint: '"PROMPT" [--variants N]'
+argument-hint: '"PROMPT" [--variants N] [--stream]'
 allowed-tools:
   - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/setup-choices.sh:*)
   - Read(.claude/choices.local.md)
@@ -28,6 +28,12 @@ Start parallel exploration by running the setup script with the user's prompt.
 - `/choices "Add user authentication"` - Start 3 variants (default)
 - `/choices "Refactor the cache" --variants 5` - Start 5 variants
 - `/choices "Implement REST endpoint" --variants 2` - Start 2 variants
+- `/choices "Write a poem" --stream` - Start with live streaming output
+
+## Options
+
+- `--variants N` - Number of parallel variants (default: 3, max: 10)
+- `--stream` - Show live streaming output from all variants in real-time
 
 ## What Happens
 
@@ -38,4 +44,5 @@ Start parallel exploration by running the setup script with the user's prompt.
    - Variant 2: Performance focus
    - Variant 3: Extensibility focus
 4. Variants work independently in their own directories
-5. User reviews all implementations and picks the best one
+5. With `--stream`: Shows interleaved real-time output from all variants
+6. User reviews all implementations and picks the best one
