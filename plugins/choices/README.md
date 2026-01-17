@@ -47,10 +47,12 @@ Start parallel exploration.
 /choices "Add user authentication with JWT"
 /choices "Refactor the cache layer" --variants 5
 /choices "Implement REST endpoint" --variants 2
+/choices "Write a greeting" --stream    # Live output!
 ```
 
 **Options:**
 - `--variants N` - Number of parallel variants (default: 3, max: 10)
+- `--stream` - Show live streaming output from all variants in real-time
 
 ### `/choices-review`
 
@@ -91,6 +93,37 @@ Each variant receives a different implementation focus:
 | 3 | Extensibility | Flexible, future-proof code. Easy modifications. |
 
 For more than 3 variants, hints cycle through the list.
+
+## Live Streaming Mode
+
+Use `--stream` to watch all variants work in real-time:
+
+```
+/choices "Add auth" --variants 3 --stream
+```
+
+Output shows color-coded, interleaved progress:
+```
+[V1] 🚀 Starting...
+[V2] 🚀 Starting...
+[V3] 🚀 Starting...
+[V1] 🔧 Using tool: Write
+[V2] 🔧 Using tool: Write
+[V1] ✅ Done. Created auth module...
+[V3] 🔧 Using tool: Edit
+[V2] ✅ Done. Implemented JWT auth...
+[V3] ✅ Done. Added OAuth support...
+
+🎉 All 3 variants complete!
+```
+
+Each variant gets a unique color:
+- V1: Cyan
+- V2: Yellow
+- V3: Magenta
+- V4: Green
+- V5: Blue
+- V6: Red
 
 ## Requirements
 
