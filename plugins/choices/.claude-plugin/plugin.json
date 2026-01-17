@@ -1,0 +1,10 @@
+{
+  "name": "choices",
+  "version": "0.1.0",
+  "description": "Parallel exploration using git worktrees - spawn multiple Claude instances to implement the same task with different approaches, then pick the best one",
+  "author": {
+    "name": "Christopher Settles",
+    "url": "https://github.com/neverSettles"
+  },
+  "keywords": ["parallel", "worktrees", "exploration", "variants", "comparison"]
+}

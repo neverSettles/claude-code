@@ -145,6 +145,17 @@
       },
       "source": "./plugins/security-guidance",
       "category": "security"
+    },
+    {
+      "name": "choices",
+      "description": "Parallel exploration using git worktrees - spawn multiple Claude instances to implement the same task with different approaches, then pick the best one",
+      "version": "0.1.0",
+      "author": {
+        "name": "Christopher Settles",
+        "url": "https://github.com/neverSettles"
+      },
+      "source": "./plugins/choices",
+      "category": "development"
     }
   ]
 }
